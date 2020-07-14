@@ -1,4 +1,5 @@
 import json
+import os
 import csv
 import logging
 from typing import TextIO, List
@@ -32,6 +33,11 @@ class Saver:
     def array_save(self, path: str, array: List) -> bool:
         try:
             file_type: str = path.split('.')[-1]
+            dirs: str = path.split('/')[:-1]
+
+            if all(dirs):
+                os.makedirs('/'.join(dirs))
+
             saver = self.__savers[file_type]
 
             with open(path, mode='x') as fh:
@@ -46,5 +52,8 @@ class Saver:
             )
         except FileExistsError:
             logging.error("File with same name already exists.")
+
+        except PermissionError:
+            logging.error("Permission denied. You should choose another path.")
 
         return False
